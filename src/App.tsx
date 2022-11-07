@@ -1,25 +1,79 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import "./App.css";
+import List from "./components/List";
+import { ListItemObj } from "./components/List/ListItem";
+import useListState, { ListState } from "./components/List/ListState";
+import Undo, { UndoObj } from "./components/Undo";
+import useUndoState from "./components/Undo/UndoState";
+import UndoInfo from "./components/UndoInfo";
+
+const addServiceWithUndo = (
+  item: ListItemObj,
+  listState: ListState
+): UndoObj => {
+  listState.add(item);
+  return {
+    message: "item added",
+    undo: () => Promise.resolve(deleteServiceWithUndo(item, listState)),
+    redo: () => Promise.resolve(addServiceWithUndo(item, listState)),
+  };
+};
+
+const deleteServiceWithUndo = (
+  item: ListItemObj,
+  listState: ListState
+): UndoObj => {
+  listState.delete(item);
+  return {
+    message: "item deleted",
+    undo: () => Promise.resolve(addServiceWithUndo(item, listState)),
+    redo: () => Promise.resolve(deleteServiceWithUndo(item, listState)),
+  };
+};
 
 function App() {
+  const undoState = useUndoState();
+  const listState = useListState();
+  const [name, setName] = useState("");
+
+  const addHandler = () => {
+    const newItem = { name };
+    setName("");
+    undoState.add(addServiceWithUndo(newItem, listState));
+  };
+
+  const deleteHandler = (item: ListItemObj) => {
+    const oldItem = item;
+    undoState.add(deleteServiceWithUndo(oldItem, listState));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <main className="body">
+      <div>
+        <h4>React - Undo Example</h4>
+      </div>
+      <div>
+        <UndoInfo undoState={undoState} />
+      </div>
+      <div></div>
+      <div>
+        <Undo undoState={undoState} />
+      </div>
+      <div>
+        <input
+          value={name}
+          onChange={(event) => {
+            setName(event.currentTarget.value);
+          }}
+        />
+        <button onClick={addHandler} disabled={!name}>
+          Add
+        </button>
+      </div>
+      <div>
+        <List listState={listState} deleteHandler={deleteHandler} />
+      </div>
+    </main>
   );
 }
 
