@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ListItemObj } from "./ListItem";
 
 //* Types
-export type ListStateProps = {};
+export type ListStateProps = { inital?: ListItemObj[] };
 
 export type ListState = ReturnType<typeof useListState>;
 
@@ -12,17 +12,17 @@ export type ListState = ReturnType<typeof useListState>;
 
 //* Helpers
 
-export default function useListState({}: ListStateProps = {}) {
+export default function useListState({ inital }: ListStateProps = {}) {
   //* Context
 
   //* State
-  const [list, setList] = useState<ListItemObj[]>([]);
+  const [list, setList] = useState<ListItemObj[]>(inital ?? []);
 
   //* Effects
 
   //* Handlers
-  const deleteHandler = (value: ListItemObj) => {
-    setList((state) => state.filter((item) => item.name !== value.name));
+  const deleteHandler = (name: string) => {
+    setList((state) => state.filter((item) => item.name !== name));
   };
 
   const addHandler = (value: ListItemObj) => {

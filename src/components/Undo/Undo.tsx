@@ -5,7 +5,6 @@ export type UndoProps = {
   undoState: UndoState;
 };
 export type UndoObj = {
-  message: string;
   undoDescription?: string;
   redoDescription?: string;
   undo: () => Promise<UndoObj>;
@@ -23,8 +22,17 @@ export default function Undo({ undoState, ...props }: UndoProps) {
   //* Context
 
   //* State
-  const { undoList, index, undo, redo, undoDiscription, redoDiscription } =
-    undoState;
+  const {
+    undoList,
+    index,
+    undo,
+    redo,
+    undoDiscription,
+    redoDiscription,
+    length,
+    undoDisabled,
+    redoDisabled,
+  } = undoState;
 
   //* Effects
 
@@ -37,7 +45,7 @@ export default function Undo({ undoState, ...props }: UndoProps) {
         <button
           title={undoDiscription ? undoDiscription : "Undo"}
           onClick={undo}
-          disabled={index <= 0}
+          disabled={undoDisabled}
           {...props}
         >
           Undo
@@ -47,7 +55,7 @@ export default function Undo({ undoState, ...props }: UndoProps) {
         <button
           title={redoDiscription ? redoDiscription : "Redo"}
           onClick={redo}
-          disabled={index >= undoList.length}
+          disabled={redoDisabled}
           {...props}
         >
           Redo

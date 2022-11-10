@@ -7,25 +7,27 @@ import Undo, { UndoObj } from "./components/Undo";
 import useUndoState from "./components/Undo/UndoState";
 import UndoInfo from "./components/UndoInfo";
 
+const addService = (item: ListItemObj, listState: ListState) =>
+  listState.add(item);
 const addServiceWithUndo = (
   item: ListItemObj,
   listState: ListState
 ): UndoObj => {
-  listState.add(item);
+  addService(item, listState);
   return {
-    message: "item added",
     undo: () => Promise.resolve(deleteServiceWithUndo(item, listState)),
     redo: () => Promise.resolve(addServiceWithUndo(item, listState)),
   };
 };
 
+const deleteService = (name: string, listState: ListState) =>
+  listState.delete(name);
 const deleteServiceWithUndo = (
   item: ListItemObj,
   listState: ListState
 ): UndoObj => {
-  listState.delete(item);
+  deleteService(item.name, listState);
   return {
-    message: "item deleted",
     undo: () => Promise.resolve(addServiceWithUndo(item, listState)),
     redo: () => Promise.resolve(deleteServiceWithUndo(item, listState)),
   };
@@ -59,7 +61,7 @@ function App() {
       <div>
         <Undo undoState={undoState} />
       </div>
-      <div>
+      <form onClick={(e) => e.preventDefault()}>
         <input
           value={name}
           onChange={(event) => {
@@ -69,7 +71,7 @@ function App() {
         <button onClick={addHandler} disabled={!name}>
           Add
         </button>
-      </div>
+      </form>
       <div>
         <List listState={listState} deleteHandler={deleteHandler} />
       </div>

@@ -21,7 +21,7 @@ export default function UndoInfo({ undoState, ...props }: UndoInfoProps) {
   //* Renders
   return (
     <div>
-      Undos: {undoState.index}/{undoState.total}
+      Undos: {undoState.index}/{undoState.length}
     </div>
   );
 }
